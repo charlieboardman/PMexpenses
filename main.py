@@ -16,11 +16,21 @@ while True:
                 USD_or_MXN = get_currency(message) #get_currency flags if the expense is in USD or MXN from the text attachment of the message
                 amount_spent = get_amount(message) #get_ammount grabs the number in pesos or dollars from the text attachment of the message
                 exchange_rate = get_exchange_rate(message,USD_or_MXN) #gets the exchange rate from the text attachment of the message if the purchase was in pesos
-                write_to_report(user,photo,description,USD_or_MXN,amount_spent,exchange_rate) #writes the expense to the last line on the user's active report. If no current report exists, initate one 
+                account = get_account(message) #gets the account from the message body
+                validity = check_valid(photo,description,USD_or_MXN,amount_spent,exchange_rate) #Check that all parameters were identified correctly
+                if validity == 'good':
+                    write_to_report(user,photo,description,USD_or_MXN,amount_spent,exchange_rate, account) #writes the expense to the last line on the user's active report. If no current report exists, initate one. account may be blank 
+                elif validity == 'errors_present':
+                    send_error_message(validity,user) #send the user an error message email based on the validity report
+                    mark_message_read(message) #mark the message read so that it will not error out again and a new message must be sent
             elif message_type == 'request_simple':
                 send_report(user) #Send the user a copy of their report and reciepts so far
             elif message_type == 'request_and_archive':
                 send_report(user) #Send the user a copy of their report and reciepts so far
                 archive_report(user) #archive the user's current report, clearing if off of current status
+            elif message_type == 'replace': #if a user makes edits to their expense report, replace the current version stored on the server with the updated version
+                replace_current_report(user,message) #pull the new expense report from the message
             mark_message_read(message) #marks the message as read in the inbox
     user = message_type = photo = description = USD_or_MXN = amount_spent = exchange_rate = 0
+
+    #idea, make one get_data() function that returns photo, description, USD_or_MXN, etc
