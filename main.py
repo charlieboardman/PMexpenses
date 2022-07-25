@@ -2,6 +2,14 @@
 
 import time
 
+class expense:
+    def __init__(self,photo,description,USD_or_MXN,amount_spent,exchange_rate,account):
+        self.photo = photo
+        self.description = description
+        self.USD_or_MXN = USD_or_MXN
+        self.amount_spent = amount_spent
+        self.exchange_rate = exchange_rate
+        self.account = account
 
 while True:
     time.sleep(60) #This program will run once every minute to check the email inbox
